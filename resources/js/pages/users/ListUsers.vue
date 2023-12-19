@@ -57,12 +57,13 @@
         <div class="container-fluid">
             <div class="card">
                 <div class="mt-3 ml-3">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createUserModal">
+                        <i class="nav-icon fas fa-plus"></i>&nbsp;
                         Add User
                     </button>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover text-center">
                         <thead>
                             <tr>
                             <th scope="col">#</th>
