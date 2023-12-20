@@ -1,14 +1,11 @@
 <script setup>
     import axios from 'axios';
-    import { ref, onMounted, reactive } from 'vue';
+    import { ref, onMounted } from 'vue';
+
+    import {Form, Field} from 'vee-validate';
+    import * as yup from 'yup';
 
     const users = ref([]);
-
-    const form = reactive({
-        'name': '',
-        'email': '',
-        'password': '',
-    })
 
     const getUsers = () => {
         axios.get('/api/users')
@@ -17,16 +14,21 @@
         })
     }
 
-    const createUser = () => {
-        axios.post('/api/users', form)
+    const createUser = (values, { resetForm }) => {
+        console.log(values);
+        axios.post('/api/users', values)
         .then((response) => {
             users.value.unshift(response.data);
-            form.name = '';
-            form.email = '';
-            form.password = '';
             $('#createUserModal').modal('hide');
+            resetForm();
         });
     }
+
+    const schema =  yup.object({
+        name: yup.string().required(),
+        email: yup.string().email().required(),
+        password: yup.string().required().min(8),
+    });
 
     onMounted(() => {
         getUsers()
@@ -93,32 +95,35 @@
     <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fs-5" id="exampleModalLabel">Add New User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input v-model="form.name" type="text" class="form-control" id="name" placeholder="Enter your name">
+                <div class="modal-header">
+                    <h5 class="modal-title fs-5 text-bold" id="exampleModalLabel">Add New User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-danger">Name *</label>
+                            <Field name="name" type="text" class="form-control" :class="{'is-invalid' : errors.name}" id="name" placeholder="Enter your name" />
+                            <span class="invalid-feedback">{{ errors.name }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-danger">Email *</label>
+                            <Field name="email" type="email" class="form-control" :class="{'is-invalid' : errors.email}" id="email" placeholder="Enter your email" />
+                            <span class="invalid-feedback">{{ errors.email }}</span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label text-danger">Password *</label>
+                            <Field name="password" type="password" class="form-control" :class="{'is-invalid' : errors.password}" id="password" />
+                            <span class="invalid-feedback">{{ errors.password }}</span>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input v-model="form.email" type="email" class="form-control" id="email" placeholder="Enter your email">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success btn-sm">Save</button>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input v-model="form.password" type="password" class="form-control" id="password">
-                    </div>
-                    </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-                <button @click="createUser" type="button" class="btn btn-success btn-sm">Save</button>
-            </div>
+                </Form>
             </div>
         </div>
     </div>
