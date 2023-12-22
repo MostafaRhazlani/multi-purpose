@@ -18,19 +18,24 @@
     }
 
     // function of create user
-    const createUser = (values, { resetForm }) => {
+    const createUser = (values, { resetForm,  setErrors}) => {
 
         axios.post('/api/users', values)
         .then((response) => {
             users.value.unshift(response.data);
             $('#userFormModal').modal('hide');
             resetForm();
-        });
+        })
+
+        .catch((error) => {
+            if(error.response.data.errors) {
+                setErrors(error.response.data.errors);
+            }
+        })
     }
 
     // function for update user
-    const updateUser = (values) => {
-        console.log(values);
+    const updateUser = (values, { setErrors }) => {
         axios.put('/api/users/' + values.id, values)
         .then((response) => {
             const index = users.value.findIndex(user => user.id === response.data.id);
@@ -38,17 +43,16 @@
             $('#userFormModal').modal('hide');
         }).catch((error) => {
             console.log(error);
-        }).finally(() => {
-            form.value.resetForm();
-        })
+                setErrors(error.response.data.errors);
+        });
     }
 
     // function for differentiates between submit updateUser and submit createUser
-    const handleSubmit = (values) => {
+    const handleSubmit = (values, actions) => {
         if(editing.value) {
-            updateUser(values)
+            updateUser(values, actions)
         } else {
-            createUser(values)
+            createUser(values, actions)
         }
     }
 
