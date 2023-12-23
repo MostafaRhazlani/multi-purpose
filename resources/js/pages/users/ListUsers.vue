@@ -4,10 +4,12 @@
 
     import {Form, Field} from 'vee-validate';
     import * as yup from 'yup';
+    import { useToastr } from '../../toastr.js'
 
     const users = ref([]);
     const editing = ref(false);
     const form = ref(null);
+    const toastr = useToastr();
 
     // function for get users
     const getUsers = () => {
@@ -25,6 +27,7 @@
             users.value.unshift(response.data);
             $('#userFormModal').modal('hide');
             resetForm();
+            toastr.success('User created successfully');
         })
 
         .catch((error) => {
@@ -41,6 +44,7 @@
             const index = users.value.findIndex(user => user.id === response.data.id);
             users.value[index] =response.data;
             $('#userFormModal').modal('hide');
+            toastr.success('User updated successfully');
         }).catch((error) => {
             console.log(error);
                 setErrors(error.response.data.errors);
@@ -90,7 +94,7 @@
     });
 
     onMounted(() => {
-        getUsers()
+        getUsers();
     })
 </script>
 
