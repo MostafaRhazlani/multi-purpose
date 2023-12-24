@@ -170,7 +170,15 @@
                                 <td>{{ user.name }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ formatDate(user.created_at) }}</td>
-                                <td>Admin</td>
+                                <td>
+                                    <span v-if="user.role === 'admin'" class="badge badge-danger badge-pill">
+                                        {{ user.role }}
+                                    </span>
+                                    <span v-else class="badge badge-success badge-pill">
+                                        {{ user.role }}
+                                    </span>
+
+                                </td>
                                 <td>
                                     <a href="#" class="badge badge-primary" @click.prevent="editUser(user)">
                                         <i class="fa fa-edit"></i>
