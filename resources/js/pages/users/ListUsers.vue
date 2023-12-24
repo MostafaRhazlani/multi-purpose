@@ -9,6 +9,7 @@
     const users = ref([]);
     const editing = ref(false);
     const form = ref(null);
+    const formDelete = ref(null);
     const toastr = useToastr();
     const userIdBeingDeleted = ref(null)
     const isReadOnly = ref(false)
@@ -85,7 +86,7 @@
     const confirmDelete = (user) => {
         userIdBeingDeleted.value = user.id;
         isReadOnly.value = true;
-        form.value.setValues({
+        formDelete.value.setValues({
             name: user.name,
             email: user.email,
         })
@@ -241,7 +242,7 @@
                 </div>
                 <div class="modal-body">
                     <h4 class="text-danger mb-3">Are you sure you want to delete:</h4>
-                    <Form ref="form">
+                    <Form ref="formDelete">
                         <div class="mb-3">
                             <Field name="name" type="text" class="form-control" :readonly="isReadOnly"/>
                         </div>
