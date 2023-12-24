@@ -4,7 +4,8 @@
 
     import {Form, Field} from 'vee-validate';
     import * as yup from 'yup';
-    import { useToastr } from '../../toastr.js'
+    import { useToastr } from '../../toastr.js';
+    import { formatDate } from '../../helper.js';
 
     const users = ref([]);
     const editing = ref(false);
@@ -168,7 +169,7 @@
                                 <th scope="row">{{ index + 1 }}</th>
                                 <td>{{ user.name }}</td>
                                 <td>{{ user.email }}</td>
-                                <td>-</td>
+                                <td>{{ formatDate(user.created_at) }}</td>
                                 <td>Admin</td>
                                 <td>
                                     <a href="#" class="badge badge-primary" @click.prevent="editUser(user)">
