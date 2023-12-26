@@ -7,15 +7,16 @@
     import debounce from 'lodash/debounce';
     import { useToastr } from '../../toastr.js';
     import UserListItem from './UserListItem.vue';
+    import { Bootstrap5Pagination } from 'laravel-vue-pagination';
 
-    const users = ref([]);
+    const users = ref({'data': []});
     const editing = ref(false);
     const toastr = useToastr();
     const form = ref(null);
 
     // function for get users
-    const getUsers = () => {
-        axios.get('/api/users')
+    const getUsers = (page = 1) => {
+        axios.get(`/api/users?page=${page}`)
         .then((response) => {
             users.value = response.data;
         })
@@ -26,10 +27,11 @@
 
         axios.post('/api/users', values)
         .then((response) => {
-            users.value.unshift(response.data);
+            users.value.data.unshift(response.data);
             $('#userFormModal').modal('hide');
             resetForm();
             toastr.success('User created successfully');
+            getUsers()
         })
 
         .catch((error) => {
@@ -43,10 +45,11 @@
     const updateUser = (values, { setErrors }) => {
         axios.put('/api/users/' + values.id, values)
         .then((response) => {
-            const index = users.value.findIndex(user => user.id === response.data.id);
-            users.value[index] =response.data;
+            const index = users.value.data.findIndex(user => user.id === response.data.id);
+            users.value.data[index] =response.data;
             $('#userFormModal').modal('hide');
             toastr.success('User updated successfully');
+            getUsers()
         }).catch((error) => {
             console.log(error);
                 setErrors(error.response.data.errors);
@@ -66,7 +69,8 @@
     }
 
     const userDeleted = (userId) => {
-        users.value = users.value.filter(user => user.id !== userId);
+        users.value.data = users.value.data.filter(user => user.id !== userId);
+        getUsers()
     }
 
     // function for differentiates between submit updateUser and submit createUser
@@ -172,8 +176,8 @@
                             <th scope="col">Options</th>
                             </tr>
                         </thead>
-                        <tbody v-if="users.length > 0">
-                            <UserListItem v-for="(user, index) in users"
+                        <tbody v-if="users.data.length > 0">
+                            <UserListItem v-for="(user, index) in users.data"
                                 :key="user.id"
                                 :user=user
                                 :index=index
@@ -187,6 +191,10 @@
                             </tr>
                         </tbody>
                     </table>
+                    <Bootstrap5Pagination class="mb-0 mt-4"
+                        :data="users"
+                        @pagination-change-page="getUsers"
+                    />
                 </div>
             </div>
         </div>
