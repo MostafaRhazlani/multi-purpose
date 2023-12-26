@@ -1,9 +1,10 @@
 <script setup>
     import axios from 'axios';
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
 
     import {Form, Field} from 'vee-validate';
     import * as yup from 'yup';
+    import debounce from 'lodash/debounce';
     import { useToastr } from '../../toastr.js';
     import UserListItem from './UserListItem.vue';
 
@@ -84,6 +85,28 @@
         $('#userFormModal').modal('show');
     }
 
+    const searchQuery = ref(null);
+
+    // Auto search
+    watch(searchQuery, debounce(() => {
+        search();
+    }, 500))
+
+    // function search
+    const search = () => {
+        axios.get('/api/users/search', {
+            params: {
+                query: searchQuery.value
+            }
+        })
+        .then(response => {
+            users.value = response.data;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
     // validation for create
     const createUserSchema =  yup.object({
         name: yup.string().required(),
@@ -126,11 +149,16 @@
     <div class="content">
         <div class="container-fluid">
             <div class="card">
-                <div class="mt-3 ml-3">
-                    <button @click="addUser" type="button" class="btn btn-primary btn-sm">
-                        <i class="nav-icon fas fa-plus"></i>&nbsp;
-                        Add user
-                    </button>
+                <div class="d-flex justify-content-between" >
+                    <div class="mt-3 ml-3">
+                        <button @click="addUser" type="button" class="btn btn-primary btn-sm">
+                            <i class="nav-icon fas fa-plus"></i>&nbsp;
+                            Add user
+                        </button>
+                    </div>
+                    <div class="mr-3 mt-3">
+                        <input type="search" v-model="searchQuery" class="form-control form-control-sm" placeholder="Serach...">
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-hover text-center">
@@ -144,7 +172,7 @@
                             <th scope="col">Options</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="users.length > 0">
                             <UserListItem v-for="(user, index) in users"
                                 :key="user.id"
                                 :user=user
@@ -152,6 +180,11 @@
                                 @user-deleted="userDeleted"
                                 @edit-user="editUser"
                             />
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="6" class="text-center">No results found...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

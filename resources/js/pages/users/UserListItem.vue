@@ -5,13 +5,9 @@
         <td>{{ user.email }}</td>
         <td>{{ formatDate(user.created_at) }}</td>
         <td>
-            <span v-if="user.role === 'admin'" class="badge badge-danger badge-pill">
-                {{ user.role }}
-            </span>
-            <span v-else class="badge badge-success badge-pill">
-                {{ user.role }}
-            </span>
-
+            <select class="form-control form-control-sm" @change="changeRole(user, $event.target.value)">
+                <option :selected="user.role === role.name" v-for="(role, index) in roles" :value="role.value" :key="index">{{ role.name }}</option>
+            </select>
         </td>
         <td>
             <!-- button edit -->
@@ -77,6 +73,7 @@
     const formDelete = ref(null);
     const toastr = useToastr();
 
+
     // Confirm delete
     const confirmDelete = (user) => {
         userIdBeingDeleted.value = user.id;
@@ -96,4 +93,26 @@
             toastr.success('User Deleted successfully');
         })
     };
+
+    // change role
+    const changeRole = (user, role) => {
+        axios.patch(`/api/users/${user.id}/change-role`, {
+            role: role,
+        })
+        .then(() => {
+            toastr.success('Role changed successfully')
+        })
+    }
+
+    const roles = ref([
+        {
+            name: 'admin',
+            value: 1
+        },
+
+        {
+            name: 'user',
+            value: 2
+        }
+    ]);
 </script>
