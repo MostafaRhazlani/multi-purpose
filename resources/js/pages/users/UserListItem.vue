@@ -1,5 +1,6 @@
 <template>
     <tr>
+        <th><input type="checkbox" @change="toggleSelection" /></th>
         <th scope="row">{{ index + 1 }}</th>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
@@ -63,12 +64,12 @@
     import { ref } from 'vue';
     import { useToastr } from '../../toastr.js';
 
-    defineProps({
+    const props = defineProps({
         user: Object,
         index: Number,
     });
 
-    const emit = defineEmits(['userDeleted', 'editUser']);
+    const emit = defineEmits(['userDeleted', 'editUser', 'toggleSelection']);
     const userIdBeingDeleted = ref(null)
     const formDelete = ref(null);
     const toastr = useToastr();
@@ -102,6 +103,10 @@
         .then(() => {
             toastr.success('Role changed successfully')
         })
+    }
+
+    const toggleSelection = () => {
+        emit('toggleSelection', props.user);
     }
 
     const roles = ref([

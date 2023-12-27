@@ -111,6 +111,35 @@
         })
     }
 
+    const userSelected = ref([]);
+
+    const toggleSelection = (user) => {
+
+        const index = userSelected.value.indexOf(user.id);
+
+        if(index === -1) {
+            userSelected.value.push(user.id);
+        } else {
+            userSelected.value.splice(index, 1);
+        }
+
+
+        console.log(userSelected.value);
+    }
+
+    const bulkDelete = () => {
+        axios.delete('/api/users', {
+            data: {
+                ids: userSelected.value
+            }
+        })
+        .then(response => {
+            getUsers();
+            userSelected.value = [];
+            toastr.success('Users deleted successfully');
+        })
+    }
+
     // validation for create
     const createUserSchema =  yup.object({
         name: yup.string().required(),
@@ -159,6 +188,10 @@
                             <i class="nav-icon fas fa-plus"></i>&nbsp;
                             Add user
                         </button>
+                        <button v-if="userSelected.length > 0" @click="bulkDelete" type="button" class="ml-2 btn btn-danger btn-sm">
+                            <i class="nav-icon fas fa-trash"></i>&nbsp;
+                            Delete selected
+                        </button>
                     </div>
                     <div class="mr-3 mt-3">
                         <input type="search" v-model="searchQuery" class="form-control form-control-sm" placeholder="Serach...">
@@ -168,6 +201,7 @@
                     <table class="table table-striped table-hover text-center">
                         <thead>
                             <tr>
+                            <th scope="col"><input type="checkbox" /></th>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
@@ -183,11 +217,12 @@
                                 :index=index
                                 @user-deleted="userDeleted"
                                 @edit-user="editUser"
+                                @toggle-selection="toggleSelection"
                             />
                         </tbody>
                         <tbody v-else>
                             <tr>
-                                <td colspan="6" class="text-center">No results found...</td>
+                                <td colspan="7" class="text-center">No results found...</td>
                             </tr>
                         </tbody>
                     </table>
