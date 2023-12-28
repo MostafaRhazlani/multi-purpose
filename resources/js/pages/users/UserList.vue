@@ -1,25 +1,26 @@
 <script setup>
     import axios from 'axios';
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
 
     import {Form, Field} from 'vee-validate';
     import * as yup from 'yup';
+    import debounce from 'lodash/debounce';
     import { useToastr } from '../../toastr.js';
-    import { formatDate } from '../../helper.js';
+    import UserListItem from './UserListItem.vue';
+    import { Bootstrap5Pagination } from 'laravel-vue-pagination';
 
-    const users = ref([]);
+    const users = ref({'data': []});
     const editing = ref(false);
-    const form = ref(null);
-    const formDelete = ref(null);
     const toastr = useToastr();
-    const userIdBeingDeleted = ref(null)
-    const isReadOnly = ref(false)
+    const form = ref(null);
 
     // function for get users
-    const getUsers = () => {
-        axios.get('/api/users')
+    const getUsers = (page = 1) => {
+        axios.get(`/api/users?page=${page}`)
         .then((response) => {
             users.value = response.data;
+            userSelected.value = [];
+            selectAll.value = false;
         })
     }
 
@@ -28,10 +29,11 @@
 
         axios.post('/api/users', values)
         .then((response) => {
-            users.value.unshift(response.data);
+            users.value.data.unshift(response.data);
             $('#userFormModal').modal('hide');
             resetForm();
             toastr.success('User created successfully');
+            getUsers()
         })
 
         .catch((error) => {
@@ -45,14 +47,31 @@
     const updateUser = (values, { setErrors }) => {
         axios.put('/api/users/' + values.id, values)
         .then((response) => {
-            const index = users.value.findIndex(user => user.id === response.data.id);
-            users.value[index] =response.data;
+            const index = users.value.data.findIndex(user => user.id === response.data.id);
+            users.value.data[index] =response.data;
             $('#userFormModal').modal('hide');
             toastr.success('User updated successfully');
+            getUsers()
         }).catch((error) => {
             console.log(error);
                 setErrors(error.response.data.errors);
         });
+    }
+
+    // function for show modal edit user and get data of user
+    const editUser = (user) => {
+        form.value.resetForm();
+        editing.value = true;
+        form.value.setValues({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        })
+        $('#userFormModal').modal('show');
+    }
+
+    const userDeleted = (userId) => {
+        users.value.data = users.value.data.filter(user => user.id !== userId);
     }
 
     // function for differentiates between submit updateUser and submit createUser
@@ -71,38 +90,64 @@
         $('#userFormModal').modal('show');
     }
 
-    // function for show modal edit user and get data of user
-    const editUser = (user) => {
-        form.value.resetForm();
-        editing.value = true;
-        form.value.setValues({
-            id: user.id,
-            name: user.name,
-            email: user.email,
+    const searchQuery = ref(null);
+
+    // Auto search
+    watch(searchQuery, debounce(() => {
+        search();
+    }, 500))
+
+    // function search
+    const search = () => {
+        axios.get('/api/users/search', {
+            params: {
+                query: searchQuery.value
+            }
         })
-        $('#userFormModal').modal('show');
+        .then(response => {
+            users.value = response.data;
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
-    // confirm delete
-    const confirmDelete = (user) => {
-        userIdBeingDeleted.value = user.id;
-        isReadOnly.value = true;
-        formDelete.value.setValues({
-            name: user.name,
-            email: user.email,
-        })
-        $('#userDeleteModal').modal('show');
+    const userSelected = ref([]);
+
+    const toggleSelection = (user) => {
+
+        const index = userSelected.value.indexOf(user.id);
+
+        if(index === -1) {
+            userSelected.value.push(user.id);
+        } else {
+            userSelected.value.splice(index, 1);
+        }
     }
 
-    // function delete user
-    const deleteUser = () => {
-        axios.delete(`/api/users/${userIdBeingDeleted.value}`)
-        .then(() => {
-            $('#userDeleteModal').modal('hide');
-            users.value = users.value.filter(user => user.id !== userIdBeingDeleted.value);
-            toastr.success('User Deleted successfully');
+    const bulkDelete = () => {
+        axios.delete('/api/users', {
+            data: {
+                ids: userSelected.value
+            }
         })
-    };
+        .then(response => {
+            getUsers();
+            userSelected.value = [];
+            selectAll.value = false;
+            toastr.success(response.data.message);
+        })
+    }
+
+
+    const selectAll = ref(false);
+    const selectAllUsers = () => {
+        if(selectAll.value) {
+            userSelected.value = users.value.data.map(user => user.id)
+        } else {
+            userSelected.value = [];
+        }
+    }
 
     // validation for create
     const createUserSchema =  yup.object({
@@ -146,16 +191,27 @@
     <div class="content">
         <div class="container-fluid">
             <div class="card">
-                <div class="mt-3 ml-3">
-                    <button @click="addUser" type="button" class="btn btn-primary btn-sm">
-                        <i class="nav-icon fas fa-plus"></i>&nbsp;
-                        Add user
-                    </button>
+                <div class="d-flex justify-content-between" >
+                    <div class="mt-3 ml-3">
+                        <button @click="addUser" type="button" class="btn btn-primary btn-sm">
+                            <i class="nav-icon fas fa-plus-circle "></i>&nbsp;
+                            Add user
+                        </button>
+                        <button v-if="userSelected.length > 0" @click="bulkDelete" type="button" class="ml-2 btn btn-danger btn-sm">
+                            <i class="nav-icon fas fa-trash"></i>&nbsp;
+                            Delete selected
+                            <span class="ml-1">{{ userSelected.length }}</span>
+                        </button>
+                    </div>
+                    <div class="mr-3 mt-3">
+                        <input type="search" v-model="searchQuery" class="form-control form-control-sm" placeholder="Serach...">
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-hover text-center">
                         <thead>
                             <tr>
+                            <th scope="col"><input type="checkbox" v-model="selectAll" @change="selectAllUsers" /></th>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
@@ -164,35 +220,28 @@
                             <th scope="col">Options</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr v-for="(user, index) in users" :key="user.id">
-                                <th scope="row">{{ index + 1 }}</th>
-                                <td>{{ user.name }}</td>
-                                <td>{{ user.email }}</td>
-                                <td>{{ formatDate(user.created_at) }}</td>
-                                <td>
-                                    <span v-if="user.role === 'admin'" class="badge badge-danger badge-pill">
-                                        {{ user.role }}
-                                    </span>
-                                    <span v-else class="badge badge-success badge-pill">
-                                        {{ user.role }}
-                                    </span>
+                        <tbody v-if="users.data.length > 0">
+                            <UserListItem v-for="(user, index) in users.data"
+                                :key="user.id"
+                                :user=user
+                                :index=index
+                                :select-all="selectAll"
+                                @user-deleted="userDeleted"
+                                @edit-user="editUser"
+                                @toggle-selection="toggleSelection"
 
-                                </td>
-                                <td>
-                                    <a href="#" class="badge badge-primary" @click.prevent="editUser(user)">
-                                        <i class="fa fa-edit"></i>
-                                        Edit
-                                    </a>
-                                    &nbsp;&nbsp;
-                                    <a href="#" class="badge badge-danger" @click.prevent="confirmDelete(user)">
-                                        <i class="fa fa-trash"></i>
-                                        Delete
-                                    </a>
-                                </td>
+                            />
+                        </tbody>
+                        <tbody v-else>
+                            <tr>
+                                <td colspan="7" class="text-center">No results found...</td>
                             </tr>
                         </tbody>
                     </table>
+                    <Bootstrap5Pagination class="mb-0 mt-4"
+                        :data="users"
+                        @pagination-change-page="getUsers"
+                    />
                 </div>
             </div>
         </div>
@@ -233,37 +282,6 @@
                         <button type="submit" class="btn btn-success btn-sm">Save</button>
                     </div>
                 </Form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Delete User -->
-    <div class="modal fade" id="userDeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fs-5 text-bold" id="exampleModalLabel">
-                        <span>Delete User</span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h4 class="text-danger mb-3">Are you sure you want to delete:</h4>
-                    <Form ref="formDelete">
-                        <div class="mb-3">
-                            <Field name="name" type="text" class="form-control" :readonly="isReadOnly"/>
-                        </div>
-                        <div class="mb-3">
-                            <Field name="email" type="email" class="form-control" :readonly="isReadOnly"/>
-                        </div>
-                    </Form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
-                    <button type="submit" @click.prevent="deleteUser" class="btn btn-danger btn-sm">Delete</button>
-                </div>
             </div>
         </div>
     </div>

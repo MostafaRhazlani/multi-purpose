@@ -9,7 +9,8 @@ use App\Models\User;
 class UserController extends Controller
 {
     public function index() {
-        $users = User::latest()->get();
+
+        $users = User::latest()->paginate();
 
         return $users;
     }
@@ -46,5 +47,28 @@ class UserController extends Controller
         $user->delete();
 
         return response()->noContent();
+    }
+
+    public function changeRole(User $user) {
+        $user->update([
+            'role' => request('role')
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function search() {
+        $searchQuery = request('query');
+
+        $users = User::where('name', 'like', "%{$searchQuery}%")->paginate();
+
+        return response()->json($users);
+    }
+
+    public function bulkDelete() {
+
+        User::whereIn('id', request('ids'))->delete();
+
+        return response()->json(['message' => 'Users deleted successfully']);
     }
 }
