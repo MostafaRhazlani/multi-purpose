@@ -19,6 +19,8 @@
         axios.get(`/api/users?page=${page}`)
         .then((response) => {
             users.value = response.data;
+            userSelected.value = [];
+            selectAll.value = false;
         })
     }
 
@@ -70,7 +72,6 @@
 
     const userDeleted = (userId) => {
         users.value.data = users.value.data.filter(user => user.id !== userId);
-        getUsers()
     }
 
     // function for differentiates between submit updateUser and submit createUser
@@ -122,9 +123,6 @@
         } else {
             userSelected.value.splice(index, 1);
         }
-
-
-        console.log(userSelected.value);
     }
 
     const bulkDelete = () => {
@@ -136,8 +134,19 @@
         .then(response => {
             getUsers();
             userSelected.value = [];
-            toastr.success('Users deleted successfully');
+            selectAll.value = false;
+            toastr.success(response.data.message);
         })
+    }
+
+
+    const selectAll = ref(false);
+    const selectAllUsers = () => {
+        if(selectAll.value) {
+            userSelected.value = users.value.data.map(user => user.id)
+        } else {
+            userSelected.value = [];
+        }
     }
 
     // validation for create
@@ -185,12 +194,13 @@
                 <div class="d-flex justify-content-between" >
                     <div class="mt-3 ml-3">
                         <button @click="addUser" type="button" class="btn btn-primary btn-sm">
-                            <i class="nav-icon fas fa-plus"></i>&nbsp;
+                            <i class="nav-icon fas fa-plus-circle "></i>&nbsp;
                             Add user
                         </button>
                         <button v-if="userSelected.length > 0" @click="bulkDelete" type="button" class="ml-2 btn btn-danger btn-sm">
                             <i class="nav-icon fas fa-trash"></i>&nbsp;
                             Delete selected
+                            <span class="ml-1">{{ userSelected.length }}</span>
                         </button>
                     </div>
                     <div class="mr-3 mt-3">
@@ -201,7 +211,7 @@
                     <table class="table table-striped table-hover text-center">
                         <thead>
                             <tr>
-                            <th scope="col"><input type="checkbox" /></th>
+                            <th scope="col"><input type="checkbox" v-model="selectAll" @change="selectAllUsers" /></th>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
@@ -215,9 +225,11 @@
                                 :key="user.id"
                                 :user=user
                                 :index=index
+                                :select-all="selectAll"
                                 @user-deleted="userDeleted"
                                 @edit-user="editUser"
                                 @toggle-selection="toggleSelection"
+
                             />
                         </tbody>
                         <tbody v-else>

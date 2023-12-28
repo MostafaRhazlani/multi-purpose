@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <th><input type="checkbox" @change="toggleSelection" /></th>
+        <th><input type="checkbox" :checked="selectAll" @change="toggleSelection" /></th>
         <th scope="row">{{ index + 1 }}</th>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
@@ -67,6 +67,7 @@
     const props = defineProps({
         user: Object,
         index: Number,
+        selectAll: Boolean,
     });
 
     const emit = defineEmits(['userDeleted', 'editUser', 'toggleSelection']);
