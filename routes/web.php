@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\AppointmentController;
+use App\Http\Controllers\Admin\AppointmentStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,7 @@ Route::delete('/api/users', [UserController::class, 'bulkDelete']);
 
 // route appointments
 Route::get('/api/appointments/', [AppointmentController::class, 'index']);
+Route::get('/api/appointment-status', [AppointmentStatusController::class, 'getCountStatus']);
 // end route appointments
 
 

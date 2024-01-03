@@ -30,19 +30,14 @@
                             </button>
                         </div>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-secondary">
+                            <button @click="getAppointments()" type="button" class="btn" :class="[selectedStatus ? 'btn-default' : 'btn-secondary']">
                                 <span class="mr-1">All</span>
-                                <span class="badge badge-pill badge-info">1</span>
+                                <span class="badge badge-pill badge-info">{{ appointmentCount }}</span>
                             </button>
 
-                            <button type="button" class="btn btn-default">
-                                <span class="mr-1">Scheduled</span>
-                                <span class="badge badge-pill badge-primary">0</span>
-                            </button>
-
-                            <button type="button" class="btn btn-default">
-                                <span class="mr-1">Closed</span>
-                                <span class="badge badge-pill badge-success">1</span>
+                            <button v-for="(status, index) in appointmentStatus" :key="index" @click="getAppointments(status.value)" type="button" class="btn" :class="[selectedStatus === status.value ? 'btn-secondary' : 'btn-default']">
+                                <span class="mr-1">{{ status.name }}</span>
+                                <span class="badge badge-pill" :class="`badge-${status.color}`">{{ status.count }}</span>
                             </button>
                         </div>
                     </div>
@@ -94,20 +89,41 @@
 
 <script setup>
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 
-const appointments = ref([]);
+// const appointmentStatus = {'scheduled':1, 'confirmed': 2, 'cancelled': 3};
+
+    const appointmentStatus = ref([]);
+    const getAppointmentStatus = () => {
+        axios.get('/api/appointment-status')
+        .then((response) => {
+            appointmentStatus.value = response.data
+        })
+    }
+
+    const selectedStatus = ref();
+    const appointments = ref([]);
+    const getAppointments = (status) => {
+        const params = {};
+        selectedStatus.value = status;
 
 
-    const getAppointments = () => {
-        axios.get('/api/appointments/')
+        if(status) {
+            params.status = status;
+        }
+        axios.get('/api/appointments/', {params: params})
         .then((response) => {
             appointments.value = response.data
         })
     }
 
+    const appointmentCount = computed(() => {
+        return appointmentStatus.value.map(status => status.count).reduce((acc, value) => acc + value, 0);
+    })
+
     onMounted(() => {
         getAppointments();
+        getAppointmentStatus();
     })
 
 </script>
