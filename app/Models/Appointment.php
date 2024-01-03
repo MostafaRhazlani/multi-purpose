@@ -11,6 +11,12 @@ class Appointment extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+        'status' => StatusType::class
+    ];
+
     public function client() {
         return $this->belongsTo(Client::class);
     }

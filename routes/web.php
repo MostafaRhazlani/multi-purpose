@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Admin\AppointmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// route users
 Route::get('/api/users', [UserController::class, 'index']);
 Route::post('/api/users', [UserController::class, 'store']);
 Route::put('/api/users/{user}', [UserController::class, 'update']);
@@ -28,5 +30,11 @@ Route::patch('/api/users/{user}/change-role', [UserController::class, 'changeRol
 Route::get('/api/users/search', [UserController::class, 'search']);
 
 Route::delete('/api/users', [UserController::class, 'bulkDelete']);
+// end route users
+
+// route appointments
+Route::get('/api/appointments/', [AppointmentController::class, 'index']);
+// end route appointments
+
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
