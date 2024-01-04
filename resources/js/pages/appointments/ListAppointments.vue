@@ -31,7 +31,7 @@
                         </div>
                         <div class="btn-group">
                             <button @click="getAppointments()" type="button" class="btn" :class="[selectedStatus ? 'btn-default' : 'btn-secondary']">
-                                <span class="mr-1">All</span>
+                                <span class="mr-1">ALL</span>
                                 <span class="badge badge-pill badge-info">{{ appointmentCount }}</span>
                             </button>
 
