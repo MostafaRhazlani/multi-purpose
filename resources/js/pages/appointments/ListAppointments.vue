@@ -24,10 +24,10 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <button type="button" class="btn btn-primary">
+                            <router-link class="btn btn-primary" to="/admin/appointments/create">
                                 <i class="nav-icon fas fa-plus-circle "></i>&nbsp;
                                 Add
-                            </button>
+                            </router-link>
                         </div>
                         <div class="btn-group">
                             <button @click="getAppointments()" type="button" class="btn" :class="[selectedStatus ? 'btn-default' : 'btn-secondary']">

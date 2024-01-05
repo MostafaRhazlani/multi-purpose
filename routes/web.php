@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\AppointmentStatusController;
 
@@ -35,8 +36,13 @@ Route::delete('/api/users', [UserController::class, 'bulkDelete']);
 
 // route appointments
 Route::get('/api/appointments/', [AppointmentController::class, 'index']);
+Route::post('/api/appointments/create', [AppointmentController::class, 'store']);
 Route::get('/api/appointment-status', [AppointmentStatusController::class, 'getCountStatus']);
 // end route appointments
+
+// route clients
+Route::get('/api/clients', [ClientController::class, 'index']);
+// end route clients
 
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
