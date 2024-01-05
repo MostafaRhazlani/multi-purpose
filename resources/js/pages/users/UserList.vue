@@ -53,8 +53,7 @@
             toastr.success('User updated successfully');
             getUsers()
         }).catch((error) => {
-            console.log(error);
-                setErrors(error.response.data.errors);
+            setErrors(error.response.data.errors);
         });
     }
 
