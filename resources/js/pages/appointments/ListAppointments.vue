@@ -67,10 +67,10 @@
                                 </td>
                                 <td>
                                     <!-- button edit -->
-                                    <a href="#" class="badge badge-primary">
+                                    <router-link :to="`/admin/appointments/${appointment.id}/edit`" class="badge badge-primary">
                                         <i class="fa fa-edit"></i>
                                         Edit
-                                    </a>
+                                    </router-link>
                                     &nbsp;&nbsp;
                                     <!-- button delete -->
                                     <a href="#" class="badge badge-danger">
