@@ -13,10 +13,15 @@
     const editing = ref(false);
     const toastr = useToastr();
     const form = ref(null);
+    const searchQuery = ref(null);
 
     // function for get users
     const getUsers = (page = 1) => {
-        axios.get(`/api/users?page=${page}`)
+        axios.get(`/api/users?page=${page}`, {
+            params: {
+                query: searchQuery.value
+            }
+        })
         .then((response) => {
             users.value = response.data;
             userSelected.value = [];
@@ -89,27 +94,12 @@
         $('#userFormModal').modal('show');
     }
 
-    const searchQuery = ref(null);
+
 
     // Auto search
     watch(searchQuery, debounce(() => {
-        search();
+        getUsers();
     }, 500))
-
-    // function search
-    const search = () => {
-        axios.get('/api/users/search', {
-            params: {
-                query: searchQuery.value
-            }
-        })
-        .then(response => {
-            users.value = response.data;
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
 
     const userSelected = ref([]);
 
