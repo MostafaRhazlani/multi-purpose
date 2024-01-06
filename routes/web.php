@@ -37,8 +37,9 @@ Route::delete('/api/users', [UserController::class, 'bulkDelete']);
 // route appointments
 Route::get('/api/appointments/', [AppointmentController::class, 'index']);
 Route::post('/api/appointments/create', [AppointmentController::class, 'store']);
-Route::get('/api/apointment/{appointment}/edit', [AppointmentController::class, 'edit']);
-Route::put('/api/apointments/{appointment}/edit', [AppointmentController::class, 'update']);
+Route::get('/api/appointment/{appointment}/edit', [AppointmentController::class, 'edit']);
+Route::put('/api/appointments/{appointment}/edit', [AppointmentController::class, 'update']);
+Route::delete('/api/appointments/{appointment}', [AppointmentController::class, 'destroy']);
 Route::get('/api/appointment-status', [AppointmentStatusController::class, 'getCountStatus']);
 // end route appointments
 
