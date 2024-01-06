@@ -133,7 +133,7 @@ const editMode = ref(false);
     };
 
     const getAppointment = () => {
-        axios.get(`/api/apointment/${route.params.id}/edit`)
+        axios.get(`/api/appointment/${route.params.id}/edit`)
         .then(({data}) => {
             form.title = data.title,
             form.client_id = data.client_id,
