@@ -131,6 +131,7 @@ import Swal from 'sweetalert2'
             if (result.isConfirmed) {
                 axios.delete(`/api/appointments/${id}`)
                 .then((response) => {
+                    appointments.value.data = appointments.value.data.filter(appointment => appointment.id !== id)
                     Swal.fire({
                     title: "Deleted!",
                     text: "Your file has been deleted.",
@@ -138,7 +139,6 @@ import Swal from 'sweetalert2'
                     });
                 })
             }
-            getAppointments();
         });
     }
 

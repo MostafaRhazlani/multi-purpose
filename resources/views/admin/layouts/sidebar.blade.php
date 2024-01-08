@@ -61,16 +61,18 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
-                    <a href="#" active-class="active" class="nav-link">
-                        <i class="nav-icon fas fa-sign-out-alt"></i>
-                        <p>
-                            Log out
-                        </p>
-                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="nav-link">
+                        @csrf
+                        <a href="#" active-class="active" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            <p>
+                                Log out
+                            </p>
+                        </a>
+                    </form>
                 </li>
             </ul>
         </nav>
-
     </div>
 
 </aside>

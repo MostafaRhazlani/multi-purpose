@@ -4,12 +4,19 @@ import AppointmentForm from './pages/appointments/AppointmentForm.vue';
 import UserList from './pages/users/UserList.vue';
 import UpdateSettings from './pages/settings/UpdateSetting.vue';
 import UpdateProfile from './pages/profile/UpdateProfile.vue';
+import Login from './pages/auth/login.vue';
 
 export default [
     {
         path: '/admin/dashboard',
         name: 'admin.dashboard',
         component: Dashboard,
+    },
+
+    {
+        path: '/login',
+        name: 'auth.login',
+        component: Login,
     },
 
     {
