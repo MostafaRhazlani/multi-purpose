@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\DashboardStatusController;
 use App\Http\Controllers\Admin\AppointmentStatusController;
@@ -53,6 +54,11 @@ Route::middleware('auth')->group(function () {
     // route clients
     Route::get('/api/clients', [ClientController::class, 'index']);
     // end route clients
+
+    // settings route
+    Route::get('/api/settings', [SettingController::class, 'index']);
+    Route::post('/api/settings', [SettingController::class, 'update']);
+    // end settings route
 });
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)')->middleware('auth');
