@@ -21,7 +21,5 @@ class AppointmentStatusController extends Controller
                 'color' => StatusType::from($status->value)->color()
             ];
         });
-
-        // collect($cases);
     }
 }

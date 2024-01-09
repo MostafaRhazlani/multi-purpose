@@ -92,8 +92,6 @@ import axios from "axios";
 import { onMounted, ref, computed } from "vue";
 import Swal from 'sweetalert2'
 
-// const appointmentStatus = {'scheduled':1, 'confirmed': 2, 'cancelled': 3};
-
     const appointmentStatus = ref([]);
     const getAppointmentStatus = () => {
         axios.get('/api/appointment-status')
