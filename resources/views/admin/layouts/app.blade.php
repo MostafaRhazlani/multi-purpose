@@ -34,6 +34,29 @@
         {{-- footer --}}
         @include('admin.layouts.footer')
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleMenuIcon = document.getElementById('toggleMenu');
+            const body = document.querySelector('body');
+
+            toggleMenuIcon.addEventListener('click', () => {
+                if(body.classList.contains('sidebar-collapse')) {
+                    localStorage.setItem('sidebarState', 'expanded');
+                } else {
+                    localStorage.setItem('sidebarState', 'collapsed');
+                }
+            });
+
+            const sidebarState = localStorage.getItem('sidebarState');
+
+            if(sidebarState === 'collapsed') {
+                body.classList.add('sidebar-collapse');
+            } else {
+                body.classList.remove('sidebar-collapse');
+            }
+        })
+    </script>
 </body>
 
 </html>
