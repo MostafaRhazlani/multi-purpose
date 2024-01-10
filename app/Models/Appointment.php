@@ -12,9 +12,7 @@ class Appointment extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    protected $appends = ['formated_start_time', 'formated_end_time'];
-
+    
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
@@ -23,17 +21,5 @@ class Appointment extends Model
 
     public function client() {
         return $this->belongsTo(Client::class);
-    }
-
-    public function formatedStartTime(): Attribute {
-        return Attribute::make(
-            get: fn () => $this->start_time->format('Y-m-d h:i A')
-        );
-    }
-
-    public function formatedEndTime(): Attribute {
-        return Attribute::make(
-            get: fn () => $this->end_time->format('Y-m-d h:i A')
-        );
     }
 }
