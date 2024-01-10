@@ -27,6 +27,7 @@
                         <div class="mb-3">
                             <label for="pageName" class="form-label">Page Name</label>
                             <input v-model="setting.page_name" type="text" class="form-control" id="pageName" placeholder="page name">
+                            <span class="text-danger text-sm" v-if="errors && errors.page_name">{{ errors.page_name[0] }}</span>
                         </div>
                         <div class="mb-3">
                             <label for="dateFormat" class="form-label">Date Format</label>
@@ -35,10 +36,12 @@
                                 <option value="YYYY-DD-MM">YYYY-DD-MM</option>
                                 <option value="YY/DD/MM">YY/DD/MM</option>
                             </select>
+                            <span class="text-danger text-sm" v-if="errors && errors.date_format">{{ errors.date_format[0] }}</span>
                         </div>
                         <div class="mb-3">
                             <label for="paginationLimit" class="form-label">Pagination Limit</label>
                             <input v-model="setting.pagination_limit" type="text" class="form-control" id="paginationLimit">
+                            <span class="text-danger text-sm" v-if="errors && errors.pagination_limit">{{ errors.pagination_limit[0] }}</span>
                         </div>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </form>
@@ -56,6 +59,7 @@ import { useToastr } from '@/toastr';
 
     const toastr = useToastr();
     const setting = ref([]);
+    const errors = ref();
 
     const getSettings = () => {
         axios.get('/api/settings')
@@ -65,9 +69,15 @@ import { useToastr } from '@/toastr';
     }
 
     const updateSettings = () => {
+        errors.value = '';
         axios.post('/api/settings', setting.value)
         .then((response) => {
             toastr.success('Settings changed successfuly');
+        })
+        .catch((error) => {
+            if(error.response && error.response.status === 422) {
+                errors.value = error.response.data.errors;
+            }
         });
     }
 
