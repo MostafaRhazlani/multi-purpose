@@ -6,7 +6,7 @@
 
     <strong>
         Copyright &copy; 2014-2023
-        <a href="https://adminlte.io">Multi-Purpose.io</a>.
+        <a href="#">{{ setting('page_name') }}</a>.
     </strong>
     All rights reserved.
 </footer>

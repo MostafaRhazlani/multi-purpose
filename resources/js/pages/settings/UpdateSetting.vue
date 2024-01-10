@@ -32,9 +32,26 @@
                         <div class="mb-3">
                             <label for="dateFormat" class="form-label">Date Format</label>
                             <select v-model="setting.date_format" id="dateFormat" class="form-control">
-                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                                <option value="YYYY-DD-MM">YYYY-DD-MM</option>
-                                <option value="YY/DD/MM">YY/DD/MM</option>
+                                <optgroup label="-">
+                                    <option value="m-d-Y">MM-DD-YYYY</option>
+                                    <option value="Y-d-m">YYYY-DD-MM</option>
+                                    <option value="y-d-m">YY-DD-MM</option>
+                                    <option value="m-d-y">MM-DD-YY</option>
+                                </optgroup>
+
+                                <optgroup label="/">
+                                    <option value="m/d/Y">MM/DD/YYYY</option>
+                                    <option value="Y/d/m">YYYY/DD/MM</option>
+                                    <option value="y/d/m">YY/DD/MM</option>
+                                    <option value="m/d/y">MM/DD/YY</option>
+                                </optgroup>
+
+                                <optgroup label="string">
+                                    <option value="F j, Y">Month DD, YYYY</option>
+                                    <option value="j F Y">Day Month YYYY</option>
+                                    <option value="F d Y">Month DD YYYY</option>
+                                    <option value="d F Y">DD Month YYYY</option>
+                                </optgroup>
                             </select>
                             <span class="text-danger text-sm" v-if="errors && errors.date_format">{{ errors.date_format[0] }}</span>
                         </div>

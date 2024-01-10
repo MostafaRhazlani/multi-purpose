@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 
 class SettingController extends Controller
 {
@@ -22,8 +23,14 @@ class SettingController extends Controller
         ]);
 
         foreach ($settings as $key => $value) {
-            Setting::where('key', $key)->update(['value' => $value]);
+
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value]
+            );
         }
+
+        Cache::flush('settings');
 
         return response()->json(['success' => true]);
     }
