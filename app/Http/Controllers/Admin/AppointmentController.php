@@ -17,7 +17,7 @@ class AppointmentController extends Controller
                 return $query->where('status', StatusType::from(request('status')));
             })
             ->latest()
-            ->paginate(setting('pagination_limit'))
+            ->paginate()
             ->through(fn ($appointment) => [
                 'id' => $appointment->id,
                 'start_time' => $appointment->start_time->format(setting('date_format')),
