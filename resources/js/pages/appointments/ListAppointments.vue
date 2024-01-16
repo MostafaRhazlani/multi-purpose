@@ -135,6 +135,7 @@ import Swal from 'sweetalert2'
                     text: "Your file has been deleted.",
                     icon: "success"
                     });
+                    getAppointmentStatus();
                 })
             }
         });
