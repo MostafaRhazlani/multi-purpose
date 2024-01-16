@@ -40,33 +40,67 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form @submit.prevent="updateProfile()">
-                        <div class="col">
-                            <div class="col-12">
-                                <div class="col-6 mx-auto">
-                                    <div class="mb-2">
-                                        <label for="changeName">Change Name</label>
-                                        <input v-model="form.name" type="text" class="form-control" id="changeName">
-                                        <span class="text-danger text-sm" v-if="errors && errors.name" >{{ errors.name[0] }}</span>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="changeEmail">Change Email</label>
-                                        <input v-model="form.email" type="text" class="form-control" id="changeEmail">
-                                        <span class="text-danger text-sm" v-if="errors && errors.email" >{{ errors.email[0] }}</span>
-                                    </div>
-                                    <button class="btn btn-primary w-100">Save</button>
+                    <div class="col">
+                        <div class="col-12">
+                            <div class="col-6 mx-auto">
+                                <div class="card-header p-2">
+                                    <ul class="nav nav-pills">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="#profile" data-toggle="tab">
+                                                <i class="fa fa-user mr-1"></i>
+                                                Edit Profile
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#changePassword" data-toggle="tab">
+                                                <i class="fa fa-key mr-1"></i>
+                                                Change Password
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="profile">
+                                            <form class="form-horizontal" @submit.prevent="updateProfile()">
+                                                <div class="mb-3">
+                                                    <label for="changeName">Change Name</label>
+                                                    <input v-model="form.name" type="text" class="form-control" id="changeName">
+                                                    <span class="text-danger text-sm" v-if="errors && errors.name" >{{ errors.name[0] }}</span>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label for="changeEmail">Change Email</label>
+                                                    <input v-model="form.email" type="text" class="form-control" id="changeEmail">
+                                                    <span class="text-danger text-sm" v-if="errors && errors.email" >{{ errors.email[0] }}</span>
+                                                </div>
+                                                <button class="btn btn-primary w-100">Save</button>
+                                            </form>
+                                        </div>
 
-                                    <div class="mt-3 d-flex">
-                                        <p>I forget my password:</p>
-                                        <a href="#" class="ml-2 text-secondary">
-                                            <i class="fas fa-key "></i>
-                                            Change Password
-                                        </a>
+                                        <div class="tab-pane" id="changePassword">
+                                            <form class="form-horizontal" @submit.prevent="changePassword()">
+                                                <div class="mb-3">
+                                                    <label for="changeName">Current password</label>
+                                                    <input v-model="changePasswordForm.currentPassword" type="password" class="form-control" id="changeName" placeholder="current password">
+                                                    <span class="text-danger text-sm" v-if="errors && errors.current_password" >{{ errors.current_password[0] }}</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="changeEmail">Password</label>
+                                                    <input v-model="changePasswordForm.password" type="password" class="form-control" id="changeEmail" placeholder="new password">
+                                                    <span class="text-danger text-sm" v-if="errors && errors.password" >{{ errors.password[0] }}</span>
+                                                </div>
+                                                <div class="mb-4">
+                                                    <label for="changeEmail">Confirm password</label>
+                                                    <input v-model="changePasswordForm.confirmPassword" type="password" class="form-control" id="changeEmail" placeholder="confirm password">
+                                                </div>
+                                                <button class="btn btn-primary w-100">Save</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,17 +111,23 @@
 <script setup>
 
 import axios from 'axios'
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useToastr } from '@/toastr.js';
 
     const toastr = useToastr();
-
+    const errors = ref();
+    const fileInput = ref(null);
+    const profilePictureUrl = ref(null);
+    const changePasswordForm = reactive({
+        currentPassword: '',
+        password: '',
+        confirmPassword: '',
+    });
     const form = ref({
         name: '',
         email: '',
         role: '',
     });
-    const errors = ref();
 
     const getUser = () => {
         axios.get('/api/profile')
@@ -109,14 +149,25 @@ import { useToastr } from '@/toastr.js';
         })
     }
 
-    const fileInput = ref(null);
+    const changePassword = () => {
+        axios.post('/api/change-user-password', changePasswordForm)
+        .then((response) => {
+            toastr.success(response.data.message).css("width","500px");
 
+            for(const field in changePasswordForm) {
+                changePasswordForm[field] = '';
+            }
+        })
+        .catch((error) => {
+            if(error.response && error.response.status === 422) {
+                errors.value = error.response.data.errors;
+            }
+        })
+    }
 
     const openFileInput = () => {
         fileInput.value.click();
     }
-
-    const profilePictureUrl = ref(null);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
