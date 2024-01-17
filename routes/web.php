@@ -6,6 +6,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\DashboardStatusController;
 use App\Http\Controllers\Admin\AppointmentStatusController;
@@ -20,10 +21,6 @@ use App\Http\Controllers\Admin\AppointmentStatusController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::middleware('auth')->group(function () {
 
@@ -67,6 +64,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/upload-profile-image', [ProfileController::class, 'uploadImage']);
     Route::post('/api/change-user-password', [ProfileController::class, 'changePassword']);
     // end profile route
+
 });
+    // register route
+    Route::post('/api/register', [RegisterController::class, 'store']);
+    // end register route
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)')->middleware('auth');

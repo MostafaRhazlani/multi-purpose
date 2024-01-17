@@ -7,6 +7,7 @@ import { createApp } from 'vue/dist/vue.esm-bundler.js';
 import { createRouter, createWebHistory } from 'vue-router';
 import Routes from './routes.js';
 import Login from './pages/auth/login.vue';
+import Register from './pages/auth/register.vue';
 
 const app = createApp({});
 
@@ -18,6 +19,7 @@ const router = createRouter({
 
 app.use(router);
 app.component('auth-login', Login)
+app.component('auth-register', Register)
 app.mount('#app');
 
 
