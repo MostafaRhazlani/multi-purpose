@@ -66,7 +66,7 @@ class User extends Authenticatable
     public function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => asset(Storage::url($value)),
+            get: fn ($value) => asset(Storage::url($value ? $value : '/photos/imgUserDefault.png'))
         );
     }
 }
