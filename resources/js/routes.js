@@ -5,6 +5,7 @@ import UserList from './pages/users/UserList.vue';
 import UpdateSettings from './pages/settings/UpdateSetting.vue';
 import UpdateProfile from './pages/profile/UpdateProfile.vue';
 import Login from './pages/auth/login.vue';
+import Register from './pages/auth/register.vue';
 
 export default [
     {
@@ -17,6 +18,12 @@ export default [
         path: '/login',
         name: 'auth.login',
         component: Login,
+    },
+
+    {
+        path: '/register',
+        name: 'auth.register',
+        component: Register,
     },
 
     {
